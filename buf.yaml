@@ -1,0 +1,12 @@
+version: v2
+modules:
+  - path: proto
+    name: buf.build/zylos/contracts
+lint:
+  use:
+    - STANDARD
+  except:
+    - PACKAGE_VERSION_SUFFIX  # we use vN package convention
+breaking:
+  use:
+    - WIRE_JSON  # both wire and JSON compatibility for cross-language safety
