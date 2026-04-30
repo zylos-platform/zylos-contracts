@@ -1,0 +1,29 @@
+version: v2
+
+# Clean output dirs before regenerating to avoid stale files.
+clean: true
+
+# Managed mode: Buf sets file-level options (java_package, go_package, etc.)
+# for us based on conventions. We don't have to write them in every .proto.
+managed:
+  enabled: true
+  override:
+    - file_option: java_package_prefix
+      value: app.zylos.contracts
+    - file_option: java_multiple_files
+      value: true
+    - file_option: java_string_check_utf8
+      value: true
+
+# Generation plugins.
+# We generate Java using Buf's remote plugins —
+# no need to install protoc-gen-java locally.
+plugins:
+  - remote: buf.build/protocolbuffers/java
+    out: gen/java
+  - remote: buf.build/grpc/java
+    out: gen/java
+
+# Inputs — what to generate from.
+inputs:
+  - directory: proto

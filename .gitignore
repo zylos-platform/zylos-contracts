@@ -13,3 +13,6 @@ Thumbs.db
 secrets/
 .env
 .env.local
+
+# Generated code 
+gen/

@@ -1,12 +1,30 @@
 version: v2
+
 modules:
   - path: proto
     name: buf.build/zylos/contracts
+
+# Lint rules — enforce API style consistency.
+# STANDARD includes BASIC + comprehensive rules for naming, file layout, etc.
 lint:
   use:
     - STANDARD
   except:
-    - PACKAGE_VERSION_SUFFIX  # we use vN package convention
+    # PACKAGE_NO_IMPORT_CYCLE is recommended but we handle this via review.
+    - PACKAGE_NO_IMPORT_CYCLE
+  enum_zero_value_suffix: _UNSPECIFIED
+  rpc_allow_same_request_response: false
+  rpc_allow_google_protobuf_empty_requests: false
+  rpc_allow_google_protobuf_empty_responses: false
+  service_suffix: Service
+
+# Breaking-change rules — enforce backward compatibility.
+# WIRE_JSON guarantees both binary wire format AND JSON encoding compatibility.
+# We choose WIRE_JSON over WIRE-only because clients may use grpc-web (JSON
+# transcoding) or gRPC reflection tools that depend on JSON shape.
 breaking:
   use:
-    - WIRE_JSON  # both wire and JSON compatibility for cross-language safety
+    - WIRE_JSON
+
+# Dependencies on external Protobuf modules.
+deps: []
