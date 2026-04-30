@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel in-progress runs on the same ref to save CI minutes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  buf-lint:
+    name: Buf Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: latest
+
+      - name: Lint Protobuf files
+        run: buf lint
+
+      - name: Verify Protobuf formatting
+        run: buf format --diff --exit-code
+
+  buf-breaking:
+    name: Buf Breaking Change Check
+    runs-on: ubuntu-latest
+    # Only run on PRs — comparing main against itself on push is meaningless.
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: latest
+
+      - name: Detect breaking changes against main
+        run: buf breaking --against ".git#branch=origin/main"
+        continue-on-error: true
+
+  avro-validate:
+    name: Validate Avro Schemas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Validate Avro JSON well-formedness
+        run: ./scripts/validate-avro.sh
+
+  conventional-commits:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify commit messages follow Conventional Commits
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: .commitlintrc.json
