@@ -1,0 +1,56 @@
+{
+    "type": "record",
+    "name": "ProductState",
+    "namespace": "app.zylos.contracts.catalog.v1",
+    "doc": "Full event-carried state-transfer snapshot of a product aggregate.",
+    "fields": [
+        {
+            "name": "productId",
+            "type": "string"
+        },
+        {
+            "name": "sellerId",
+            "type": "string"
+        },
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "description",
+            "type": [
+                "null",
+                "string"
+            ],
+            "default": null
+        },
+        {
+            "name": "categoryId",
+            "type": "string"
+        },
+        {
+            "name": "attributes",
+            "type": {
+                "type": "array",
+                "items": "app.zylos.contracts.catalog.v1.Attribute"
+            },
+            "default": []
+        },
+        {
+            "name": "status",
+            "type": "string"
+        },
+        {
+            "name": "version",
+            "type": "long"
+        },
+        {
+            "name": "variants",
+            "type": {
+                "type": "array",
+                "items": "app.zylos.contracts.catalog.v1.VariantState"
+            },
+            "default": []
+        }
+    ]
+}
