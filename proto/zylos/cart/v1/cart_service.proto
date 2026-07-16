@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package zylos.cart.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// CartService is the synchronous, internal (east-west) surface for the Cart
+// bounded context. It is consumed by trusted callers over gRPC inside the mesh
+// — principally the Checkout saga, which reads the cart and drives it to the
+// CONVERTED terminal state. Customer-facing cart mutations (add / change / remove)
+// are exposed as REST commands via the BFF.
+service CartService {
+  // GetCart returns the current state of a cart by id. Returns NOT_FOUND if the
+  // cart does not exist (carts are created lazily on first add).
+  rpc GetCart(GetCartRequest) returns (GetCartResponse);
+
+  // MarkCartConverted transitions an ACTIVE cart to CONVERTED, binding it to the
+  // Order it became. Idempotent on idempotency_key. Called synchronously by the
+  // Checkout saga so the transition's outcome is observed within the saga step;
+  // it is deliberately NOT event-driven, to close the window in which a cart
+  // that has already become an order could still be mutated.
+  rpc MarkCartConverted(MarkCartConvertedRequest) returns (MarkCartConvertedResponse);
+}
+
+// CartStatus is the lifecycle state of a cart aggregate.
+enum CartStatus {
+  CART_STATUS_UNSPECIFIED = 0;
+  CART_STATUS_ACTIVE = 1;
+  CART_STATUS_CONVERTED = 2;
+  CART_STATUS_MERGED = 3;
+}
+
+// LineOrigin records whether a line was existence/price-validated against
+// Catalog at write time, or accepted under degraded-accept for later validation.
+enum LineOrigin {
+  LINE_ORIGIN_UNSPECIFIED = 0;
+  LINE_ORIGIN_VALIDATED = 1;
+  LINE_ORIGIN_VALIDATION_PENDING = 2;
+}
+
+// OwnerType distinguishes an authenticated customer from an anonymous guest.
+enum OwnerType {
+  OWNER_TYPE_UNSPECIFIED = 0;
+  OWNER_TYPE_CUSTOMER = 1;
+  OWNER_TYPE_GUEST = 2;
+}
+
+// Money is an exact monetary amount in integer minor units.
+message Money {
+  // ISO 4217 currency code, e.g. "USD".
+  string currency_code = 1;
+  // Amount in the currency's minor unit (e.g. cents). 1099 == USD 10.99.
+  int64 amount_minor = 2;
+}
+
+// CartOwner identifies the owning principal.
+message CartOwner {
+  OwnerType owner_type = 1;
+  // Subject identifier: Keycloak subject for a customer, guest UUID for a guest.
+  string owner_id = 2;
+}
+
+// CartLine is one SKU line. Price fields are an advisory snapshot, re-quoted
+// authoritatively at Checkout; they may be unset under degraded-accept.
+message CartLine {
+  string sku = 1;
+  int32 quantity = 2;
+  Money unit_price = 3;
+  google.protobuf.Timestamp price_captured_at = 4;
+  int64 catalog_version = 5;
+  string seller_id = 6;
+  LineOrigin line_origin = 7;
+  google.protobuf.Timestamp added_at = 8;
+}
+
+// Cart is the internal representation of a cart aggregate.
+message Cart {
+  string cart_id = 1;
+  CartOwner owner = 2;
+  CartStatus status = 3;
+  // ISO 4217 code; single currency per cart. Empty when the cart has no lines.
+  string currency_code = 4;
+  repeated CartLine lines = 5;
+  int64 version = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+  // Set when status == CART_STATUS_CONVERTED.
+  string converted_order_id = 9;
+  // Set when status == CART_STATUS_MERGED.
+  string merged_into_cart_id = 10;
+}
+
+message GetCartRequest {
+  string cart_id = 1;
+}
+message GetCartResponse {
+  Cart cart = 1;
+}
+
+message MarkCartConvertedRequest {
+  string cart_id = 1;
+  // The Order this cart became.
+  string order_id = 2;
+  // Expected aggregate version for optimistic concurrency; the call fails with
+  // FAILED_PRECONDITION if the cart has moved on.
+  int64 expected_version = 3;
+  // Client-supplied idempotency key; repeated submissions are de-duplicated.
+  string idempotency_key = 4;
+}
+message MarkCartConvertedResponse {
+  Cart cart = 1;
+}
