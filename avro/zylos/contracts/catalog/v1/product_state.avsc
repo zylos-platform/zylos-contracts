@@ -32,7 +32,7 @@
             "name": "attributes",
             "type": {
                 "type": "array",
-                "items": "app.zylos.contracts.catalog.v1.Attribute"
+                "items": "app.zylos.contracts.catalog.v1.AttributeEntry"
             },
             "default": []
         },
@@ -43,6 +43,13 @@
         {
             "name": "version",
             "type": "long"
+        },
+        {
+            "name": "updatedAt",
+            "type": {
+                "type": "long",
+                "logicalType": "timestamp-micros"
+            }
         },
         {
             "name": "variants",
