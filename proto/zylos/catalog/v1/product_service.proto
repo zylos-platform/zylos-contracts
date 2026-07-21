@@ -16,6 +16,10 @@ service ProductService {
   rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
   // UpdateProduct mutates an existing product.
   rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse);
+  // GetVariantBySku returns a single SKU to the minimal snapshot.
+  rpc GetVariantBySku(GetVariantBySkuRequest) returns (GetVariantBySkuResponse);
+  // BatchGetVariantsBySku returns many SKUs in one round trip.
+  rpc BatchGetVariantsBySku(BatchGetVariantsBySkuRequest) returns (BatchGetVariantsBySkuResponse);
 }
 
 // ProductStatus is the lifecycle state of a product.
@@ -100,4 +104,32 @@ message UpdateProductRequest {
 }
 message UpdateProductResponse {
   Product product = 1;
+}
+
+// VariantSnapshot is the minimal purchasability and pricing view of a single SKU.
+message VariantSnapshot {
+  string sku = 1;
+  string product_id = 2;
+  // Empty when the SKU matches the product itself rather than one of its variants.
+  string variant_id = 3;
+  string seller_id = 4;
+  Money list_price = 5;
+  bool purchasable = 6;
+  // Aggregate version the snapshot was taken from, so downstream contexts can
+  // detect staleness when they re-quote authoritatively.
+  int64 catalog_version = 7;
+}
+
+message GetVariantBySkuRequest {
+  string sku = 1;
+}
+message GetVariantBySkuResponse {
+  VariantSnapshot variant = 1;
+}
+
+message BatchGetVariantsBySkuRequest {
+  repeated string skus = 1;
+}
+message BatchGetVariantsBySkuResponse {
+  map<string, VariantSnapshot> variants = 1;
 }

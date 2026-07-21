@@ -61,11 +61,15 @@
     },
     {
       "name": "addedAt",
-      "type": {
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      },
-      "doc": "When the line was first added to the cart."
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ],
+      "default": null,
+      "doc": "When the line was first added. Optional: the domain does not track per-line add time; derive from the CartLineAdded event stream when needed."
     }
   ]
 }
