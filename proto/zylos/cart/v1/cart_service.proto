@@ -3,6 +3,7 @@ syntax = "proto3";
 package zylos.cart.v1;
 
 import "google/protobuf/timestamp.proto";
+import "zylos/common/v1/money.proto";
 
 // CartService is the synchronous, internal (east-west) surface for the Cart
 // bounded context. It is consumed by trusted callers over gRPC inside the mesh
@@ -45,14 +46,6 @@ enum OwnerType {
   OWNER_TYPE_GUEST = 2;
 }
 
-// Money is an exact monetary amount in integer minor units.
-message Money {
-  // ISO 4217 currency code, e.g. "USD".
-  string currency_code = 1;
-  // Amount in the currency's minor unit (e.g. cents). 1099 == USD 10.99.
-  int64 amount_minor = 2;
-}
-
 // CartOwner identifies the owning principal.
 message CartOwner {
   OwnerType owner_type = 1;
@@ -65,7 +58,7 @@ message CartOwner {
 message CartLine {
   string sku = 1;
   int32 quantity = 2;
-  Money unit_price = 3;
+  zylos.common.v1.Money unit_price = 3;
   google.protobuf.Timestamp price_captured_at = 4;
   int64 catalog_version = 5;
   string seller_id = 6;
