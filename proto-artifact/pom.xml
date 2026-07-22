@@ -7,7 +7,7 @@
   <parent>
     <groupId>app.zylos</groupId>
     <artifactId>zylos-contracts</artifactId>
-    <version>1.0.0</version>
+    <version>999-SNAPSHOT</version>
   </parent>
 
   <artifactId>zylos-contracts-proto</artifactId>
