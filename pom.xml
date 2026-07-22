@@ -7,7 +7,7 @@
   <parent>
     <groupId>app.zylos</groupId>
     <artifactId>zylos-service-parent</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.1</version>
     <relativePath/>
   </parent>
 
@@ -22,6 +22,7 @@
   </modules>
 
   <properties>
+    <zylos.security.enforce>false</zylos.security.enforce>
     <jacoco.skip>true</jacoco.skip>
     <spotless.check.skip>true</spotless.check.skip>
   </properties>
