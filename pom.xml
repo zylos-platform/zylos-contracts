@@ -7,12 +7,12 @@
   <parent>
     <groupId>app.zylos</groupId>
     <artifactId>zylos-service-parent</artifactId>
-    <version>0.7.2</version>
+    <version>0.7.3</version>
     <relativePath/>
   </parent>
 
   <artifactId>zylos-contracts</artifactId>
-  <version>1.0.0</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Canonical Zylos contracts — published Avro and Protobuf/gRPC artifacts</description>
 
