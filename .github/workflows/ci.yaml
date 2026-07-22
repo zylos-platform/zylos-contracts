@@ -52,7 +52,6 @@ jobs:
 
       - name: Detect breaking changes against main
         run: buf breaking --against ".git#branch=origin/main"
-        continue-on-error: true
 
   avro-validate:
     name: Validate Avro Schemas
