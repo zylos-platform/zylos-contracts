@@ -4,13 +4,10 @@ modules:
   - path: proto
     name: buf.build/zylos/contracts
 
-# Lint rules — enforce API style consistency.
-# STANDARD includes BASIC + comprehensive rules for naming, file layout, etc.
 lint:
   use:
     - STANDARD
   except:
-    # PACKAGE_NO_IMPORT_CYCLE is recommended but we handle this via review.
     - PACKAGE_NO_IMPORT_CYCLE
   enum_zero_value_suffix: _UNSPECIFIED
   rpc_allow_same_request_response: false
@@ -26,5 +23,4 @@ breaking:
   use:
     - WIRE_JSON
 
-# Dependencies on external Protobuf modules.
 deps: []
