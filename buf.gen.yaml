@@ -1,10 +1,5 @@
 version: v2
-
-# Clean output dirs before regenerating to avoid stale files.
 clean: true
-
-# Managed mode: Buf sets file-level options (java_package, go_package, etc.)
-# for us based on conventions. We don't have to write them in every .proto.
 managed:
   enabled: true
   override:
@@ -16,14 +11,11 @@ managed:
       value: true
 
 # Generation plugins.
-# We generate Java using Buf's remote plugins —
-# no need to install protoc-gen-java locally.
 plugins:
-  - remote: buf.build/protocolbuffers/java
-    out: gen/java
+  - remote: buf.build/protocolbuffers/java:v34.1
+    out: proto-artifact/target/generated-sources/buf
   - remote: buf.build/grpc/java
-    out: gen/java
+    out: proto-artifact/target/generated-sources/buf
 
-# Inputs — what to generate from.
 inputs:
   - directory: proto
