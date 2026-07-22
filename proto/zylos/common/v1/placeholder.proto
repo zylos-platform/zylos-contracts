@@ -1,5 +1,0 @@
-syntax = "proto3";
-package zylos.common.v1;
-
-// Initial schema to establish the repository base.
-message InitialState {}

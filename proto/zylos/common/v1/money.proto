@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package zylos.common.v1;
+
+// Money is an exact monetary amount in integer minor units.
+message Money {
+  // ISO 4217 currency code, e.g. "USD".
+  string currency_code = 1;
+  // Amount in the currency's minor unit (e.g. cents). 1099 == USD 10.99.
+  int64 minor_units = 2;
+}
